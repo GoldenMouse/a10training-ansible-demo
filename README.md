@@ -11,6 +11,22 @@ Therefore it's best to follow the lab guide from the course when running this pr
  - installs correct ansible version
  - installs a10-ansible modules 
 
+## An explanation of playbooks/a10_defaults.yml
+A10-Ansible uses HTTP requests which requires, for authentication, the same 5 parameters in every one of its modules:
+```yml
+  a10_host: "{{ acos_host }}"
+  a10_username: "{{ acos_username }}"
+  a10_password: "{{ acos_password }}"
+  a10_port: "{{ acos_port }}"
+  a10_protocol: "{{ acos_protocol }}"
+```
+To save effort of including this in every module, which would also make your playbooks needlessly long, I've created this 
+work-around in a10_defaults.yml. 
+
+What a10_defaults.yml does is use Ansible builtin [module_defaults](https://docs.ansible.com/ansible/latest/user_guide/playbooks_module_defaults.html) to set default parameters for any modules.
+I loop through the modules we'll be using in this project and append the five A10 parameters.
+KEEP IN MIND - if you're using additional a10_modules, remember to add it to this list in a10_defaults.yml. 
+
 ## Lab 1: Load Balancing
  1. create slb server 
  2. create slb service groups
