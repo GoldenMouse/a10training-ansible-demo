@@ -12,21 +12,21 @@ Therefore it's best to follow the lab guide from the course when running this pr
  - installs a10-ansible modules 
 
 ## Lab 1: Load Balancing
- - create slb server 
- - create slb service groups
- - create slb source nat pool
- - create source ip persistence template
- - create virtual server and vport
+ 1. create slb server 
+ 2. create slb service groups
+ 3. create slb source nat pool
+ 4. create source ip persistence template
+ 5. create virtual server and vport
  
 ## Lab2: HTTP Server
- - create http layer 7 monitor
- - create http nat pool
- - create cookie persistence template
- - create http templates
- - create http VIP
+ 1. create http layer 7 monitor
+ 2. create http nat pool
+ 3. create cookie persistence template
+ 4. create http templates
+ 5. create http VIP
  
 ## Lab3: HTTPS Server
- - manually create ssl keypair
- - create ssl tempalte
- - create ssl nat
- - create https VIP
+ 1. manually create ssl keypair
+ 2. create ssl tempalte
+ 3. create ssl nat
+ 4. create https VIP
