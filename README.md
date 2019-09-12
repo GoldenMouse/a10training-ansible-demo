@@ -18,14 +18,14 @@ Therefore it's best to follow the lab guide from the course when running this pr
  4. create source ip persistence template
  5. create virtual server and vport
  
-## Lab2: HTTP Server
+## Lab 2: HTTP Server
  1. create http layer 7 monitor
  2. create http nat pool
  3. create cookie persistence template
  4. create http templates
  5. create http VIP
  
-## Lab3: HTTPS Server
+## Lab 3: HTTPS Server
  1. manually create ssl keypair
  2. create ssl tempalte
  3. create ssl nat
