@@ -1,0 +1,37 @@
+---
+# Set a10-ansible default parameters.
+# A hack to help reduce verbosity and redundancy
+ 
+- name: "set a10 ansible default params"
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: true
+
+  tasks:
+    - name: set a10 variables
+      set_fact:
+        a10_vars:
+          a10_host: "192.168.0.10"
+          a10_username: "admin"
+          a10_password: "a10"
+          a10_port: 443
+          a10_protocol: "https"
+
+    - name: create dict for use with module_defaults
+      set_fact:
+        a10_module_defaults: "{{ a10_module_defaults | default({}) | combine({ item: a10_vars}) }}"
+      with_items:
+        # place a10 modules being used here
+        - a10_slb_server
+        - a10_slb_service_group
+        - a10_ip_nat_pool
+        - a10_slb_template_persist_source_ip
+        - a10_slb_virtual_server
+        - a10_slb_virtual_server_port
+        - a10_health_monitor
+        - a10_health_monitor_method_http
+        - a10_slb_template_persist_cookie
+        - a10_slb_template_http
+        - a10_slb_template_client_ssl
+        - a10_write_memory

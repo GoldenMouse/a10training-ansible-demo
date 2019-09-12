@@ -1,0 +1,45 @@
+---
+
+all:
+    
+  hosts:
+    localhost:
+      ansible_host: "192.168.0.100"
+
+  children: 
+    acos:
+      hosts:
+        master: 
+          ansible_host: "192.168.0.100"
+        a1: 
+          ansible_host: "192.168.0.1"
+
+        a2: 
+          ansible_host: "192.168.0.2"
+
+        a3: 
+          ansible_host: "192.168.0.3"
+
+        a4: 
+          ansible_host: "192.168.0.4"
+
+
+    routers:
+      hosts:
+        router:
+          ansible_host: "192.168.0.21"
+
+    webservers:
+      hosts:
+        s1:
+          ansible_host: "192.168.0.11"
+          eth1:
+            ip: "10.5.30.11"
+            mask: "255.255.255.0"
+            gw: ""
+        s2:
+          ansible_host: "192.168.0.12"
+          eth1:
+            ip: "10.5.30.12"
+            mask: "255.255.255.0"
+            gw: ""

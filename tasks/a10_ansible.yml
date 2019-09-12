@@ -1,0 +1,36 @@
+---
+- name: check if library directory exists
+  stat:
+    path: "{{ inventory_dir }}/library/"
+  register: library
+
+- block:
+    - name: install epel
+      package:
+        name: epel-release
+        state: present
+
+    - name: install pip
+      package:
+        name: python-pip
+        state: present
+
+    - name: install a10 ansible
+      pip: 
+        name: git+https://github.com/a10networks/a10-ansible 
+      
+    - name: download a10_ansible git
+      git:
+        name: https://github.com/a10networks/a10-ansible 
+        dest: /tmp/a10-ansible
+
+    - name: copy library directory
+      command: "mv /tmp/a10-ansible/a10_ansible/library {{ inventory_dir }}"
+
+    - name: remove temp files
+      file:
+        path: /tmp/a10-ansible
+        state: absent
+
+  when: not library.stat.exists
+

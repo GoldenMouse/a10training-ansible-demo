@@ -1,0 +1,30 @@
+---
+
+# Set a10 ansible module default parameters
+- import_playbook: playbooks/a10_defaults.yml
+
+- name: "A10 Ansible: Sample ADC Project"
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: true
+  module_defaults: "{{ a10_module_defaults }}"
+
+  pre_tasks:
+    - name: verify Ansible meets version requirements
+      assert:
+        that: "ansible_version.full is version_compare('2.8', '>=')"
+        msg: "You must update Ansible to at least 2.8. Please run ansible-playbook playbooks/update_ansible.yml"
+
+    - name: install a10-ansible
+      import_tasks: tasks/a10_ansible.yml
+
+  tasks:
+    - name: lab1
+      include_tasks: tasks/lab1.yml
+
+    - name: lab2
+      include_tasks: tasks/lab2.yml
+
+    - name: lab3
+      include_tasks: tasks/lab3.yml

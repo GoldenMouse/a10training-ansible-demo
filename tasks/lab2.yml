@@ -1,0 +1,75 @@
+---
+
+#########################
+##   ADC - Lab 2 
+##   HTTP vPort
+#########################
+
+## HTTP Layer 7 Health Monitor
+ 
+- name: create HTTP L7 health monitors
+  a10_health_monitor:
+    name: "{{ item.name }}"
+    method:
+      http:
+        http: true
+        http-port: "80"
+        http-expect: true
+        http-text: "{{ item.text }}"
+  with_items:
+    - { name: 'HM-EXPECT1', text: 'broken-server' }
+    - { name: 'HM-EXPECT2', text: 'Temporibus' }
+
+- name: apply health monitor to service group
+  a10_slb_service_group:
+    name: "SG-HTTP"
+    health_check: "HM-EXPECT2"
+    lb_method: "round-robin"
+
+## HTTP vPort
+ 
+- name: create ip nat pool, assigned to vrid1
+  a10_ip_nat_pool:
+    pool_name: "NAT-HTTP"
+    netmask: "24"
+    start_address: "10.5.1.21"
+    end_address: "10.5.1.21"
+    vrid: 1
+
+- name: create cookie persistence template
+  a10_slb_template_persist_cookie: 
+    name: "TP-CPERS"
+    cookie_name: "ElvisLives"
+
+- name: create HTTP templates to inserts a header
+  a10_slb_template_http:
+    name: "TP-CLIENT-IP"
+    insert_client_ip: true
+
+- name: create HTTP templates for failover 
+  a10_slb_template_http:
+    name: "TP-FAILOVER"
+    failover_url: "http://100.64.50.31/"
+
+- name: create HTTP virtual server. apply to vrid1
+  a10_slb_virtual_server: 
+    name: "VIP-HTTP"
+    ip_address: "100.64.1.21"
+    vrid: "1"
+
+- name: create virtual server port
+  a10_slb_virtual_server_port: 
+    port_number: 80
+    protocol: http
+    action: enable
+    virtual_server_name: "VIP-HTTP"
+    service_group: "SG-HTTP"
+    pool: "NAT-HTTP"
+    template_persist_cookie: "TP-CPERS"
+    template_http: "TP-CLIENT-IP"
+
+- name: write mem 
+  a10_write_memory:
+    state: "present"
+    partition: "shared"
+

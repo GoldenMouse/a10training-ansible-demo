@@ -1,0 +1,70 @@
+---
+
+#########################
+##   ADC - Lab 1  
+#    Load Balancing
+#########################
+
+
+- name: create SLB for webservers s1 and s2
+  a10_slb_server:
+    name: "{{ item.name }}"
+    host: "{{ item.ip }}"
+    action: enable
+    template_server: default
+    port_list: 
+      - action: enable
+        port_number: 80
+        protocol: tcp
+  with_items:
+    - { name: 's1', ip: '10.5.30.11' }
+    - { name: 's2', ip: '10.5.30.12' }
+  
+
+- name: create SLB service groups
+  a10_slb_service_group:
+    name: "SG-HTTP"
+    protocol: tcp
+    lb_method: "round-robin"
+    member_list:
+      - { name: 's1', port: '80' }
+      - { name: 's2', port: '80' }
+ 
+
+- name: create source NAT pool
+  a10_ip_nat_pool:
+    state: present
+    pool_name: "NAT-L4"
+    netmask: "24"
+    start_address: "10.5.1.20"
+    end_address: "10.5.1.20"
+
+
+- name: create source IP persistence template
+  a10_slb_template_persist_source_ip:
+    state: present
+    name: "TP-PERSIST"
+  
+
+- name: create virtual server
+  a10_slb_virtual_server: 
+    name: "VIP-TCP"
+    ip_address: "100.64.1.20"
+
+
+- name: create virtual server port
+  a10_slb_virtual_server_port: 
+    port_number: 80
+    protocol: tcp
+    action: enable
+    virtual_server_name: "VIP-TCP"
+    template_persist_source_ip: "TP-PERSIST"
+    pool: "NAT-L4"
+    service_group: "SG-HTTP"
+
+
+- name: write mem 
+  a10_write_memory:
+    state: "present"
+    partition: "shared"
+

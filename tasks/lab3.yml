@@ -1,0 +1,49 @@
+---
+
+#######################################
+##   ADC - Lab 3 
+##   HTTPS vPort  
+#######################################
+
+#!!! Before doing this lab, create SSL key pair on targeted acos name CT-CERT1
+#!!! cli command:   "pki create certificate CT-CERT1 certtype rsa"
+ 
+## HTTPS vPort with SSL-Offload
+
+- name: create client ssl template and add the created cert/key 
+  a10_slb_template_client_ssl:
+    name: "TP-CSSL"
+    cert_str: "CT-CERT1"
+    key_str: "CT-CERT1"
+
+- name: create ip nat pool for ssl offload, assigned to vrid2
+  a10_ip_nat_pool:
+    pool_name: "NAT-SSL"
+    netmask: "24"
+    start_address: "10.5.1.22"
+    end_address: "10.5.1.22"
+    vrid: "2"
+
+- name: create HTTP virtual server. apply to vrid2
+  a10_slb_virtual_server: 
+    name: "VIP-SSL"
+    ip_address: "100.64.1.22"
+    vrid: "2"
+
+- name: create virtual server port
+  a10_slb_virtual_server_port: 
+    port_number: 443
+    protocol: https
+    action: enable
+    virtual_server_name: "VIP-SSL"
+    service_group: "SG-HTTP"
+    pool: "NAT-SSL"
+    template_persist_cookie: "TP-CPERS"
+    template_client_ssl: "TP-CSSL"
+    template_http: "TP-CLIENT-IP"
+
+- name: write mem 
+  a10_write_memory:
+    state: "present"
+    partition: "shared"
+
